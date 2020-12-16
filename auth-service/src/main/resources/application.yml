@@ -1,0 +1,30 @@
+server:
+  port: 8081
+security:
+  basic:
+    enabled:false
+
+management:
+  security:
+    enabled:false
+
+
+spring:
+  application:
+    name: poll-service
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://db:5432/authdb
+    username: poll
+    password: poll
+    initialization-mode: always
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+

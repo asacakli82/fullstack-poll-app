@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+if [ "${BRANCH_NAME}" == "prod" ]; then 
+echo "java ${JVM_OPTS} -javaagent:/appdynamics/AppServerAgent/javaagent.jar -Dappdynamics.controller.hostName=apm.vodafone.local -Dappdynamics.controller.port=80 -Dappdynamics.agent.accountName=customer1 -Dappdynamics.agent.accountAccessKey=${APPDYNAMICS_KEY} -Dappdynamics.agent.applicationName=SotOcpProd -Dappdynamics.agent.tierName=${APP_NAME} -Dappdynamics.agent.reuse.nodeName=true -Dappdynamics.agent.reuse.nodeName.prefix=${HOSTNAME} -Djava.security.egd=file:/dev/./urandom -Dserver.port=${SERVER_PORT} -jar ${APP_NAME}-${APP_VERSION}.jar"
+exec  java ${JVM_OPTS} -javaagent:/appdynamics/AppServerAgent/javaagent.jar -Dappdynamics.controller.hostName=apm.vodafone.local -Dappdynamics.controller.port=80 -Dappdynamics.agent.accountName=customer1 -Dappdynamics.agent.accountAccessKey=${APPDYNAMICS_KEY} -Dappdynamics.agent.applicationName=SotOcpProd -Dappdynamics.agent.tierName=${APP_NAME} -Dappdynamics.agent.reuse.nodeName=true -Dappdynamics.agent.reuse.nodeName.prefix=${HOSTNAME} -Djava.security.egd=file:/dev/./urandom -Dserver.port=${SERVER_PORT} -jar ${APP_NAME}-${APP_VERSION}.jar
+else
+echo "java ${JVM_OPTS} -Djava.security.egd=file:/dev/./urandom -Dserver.port=${SERVER_PORT} -jar ${APP_NAME}-${APP_VERSION}.jar"
+exec  java ${JVM_OPTS} -Djava.security.egd=file:/dev/./urandom -Dserver.port=${SERVER_PORT} -jar ${APP_NAME}-${APP_VERSION}.jar
+fi

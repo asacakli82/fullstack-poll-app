@@ -1,0 +1,88 @@
+version: '3.7'
+
+# Define services
+services:
+
+  poll-server:
+    container_name: poll-server
+    build:
+      context: ../poll-service
+      dockerfile: ../poll-service/Dockerfile
+    ports:
+      - "8082:8080"
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/polldb
+      SPRING_DATASOURCE_USERNAME: poll
+      SPRING_DATASOURCE_PASSWORD: poll
+    command: ["./wait-for-postgres.sh", "db", "python", "app.py"]
+    networks:
+      - pollapplication
+    links:
+      - "db:db"
+  auth-server:
+    container_name: auth-server
+    build:
+      context: ../auth-service
+      dockerfile: ../auth-service/Dockerfile
+    ports:
+      - "8081:8080"
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/authdb
+      SPRING_DATASOURCE_USERNAME: poll
+      SPRING_DATASOURCE_PASSWORD: poll
+    command: ["./wait-for-postgres.sh", "db", "python", "app.py"]
+    networks:
+      - pollapplication
+    links:
+      - "db:db"
+  
+  poll-client:
+    container_name: poll-client
+    build:
+      context: ../poll-client
+      dockerfile: ../poll-client/Dockerfile
+    ports:
+      - "3000:80"
+    restart: always
+    depends_on:
+      - poll-server
+      - auth-server
+    networks:
+      - pollapplication
+
+  db:
+    container_name: db
+    build:
+      context: ..
+      dockerfile: Dockerfile-multiple-db
+    restart: always
+    volumes:
+      - ../postgresql-multiple-databases:/docker-entrypoint-initdb.d
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=polldb,authdb
+      - POSTGRES_USER=poll
+      - POSTGRES_PASSWORD=poll
+    ports:
+      - '5432:5432'
+    expose:
+      - '5432'
+    networks:
+      - pollapplication
+
+
+# Volumes
+volumes:
+  db:
+
+# Networks to be created to facilitate communication between containers
+networks:
+  pollapplication:
+
+
